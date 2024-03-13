@@ -1,0 +1,172 @@
+﻿@page "/flights"
+
+@using FlightBookingSystem.Components.ViewModel
+@using FlightBookingSystem.Components.Model
+
+<style>
+    /*Add CSS styling here*/
+    header
+    {
+        padding: 10px;
+        text-align: center;
+    }
+
+    .row
+    {
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    label
+    {
+        font-weight: bold;
+    }
+</style>
+
+<div class="container">
+    <div class="row">
+        <div>
+            <header class="align-content-center">
+                <h3>Flight Finder</h3>
+            </header>
+        </div>
+        <div class="row">
+
+            <!-- Select dropdown for Source -->
+            <div class="col-sm-3">
+                <label for="srcSelector">From: </label>
+                <select name="srcSelector" class="form-control" @bind="srcValue">
+                    <option value="@Utils.ANY">@Utils.ANY</option>
+                    @if (airports == null)
+                    {
+                        <option>Loading...</option>
+                    }
+                    else
+                    {
+                        @foreach (var a in airports)
+                        {
+                            <option value=@a>@a</option>
+                        }
+                    }
+                </select>
+         </div>
+     </div>
+</div>
+
+            <!-- Select dropdown for Destination -->
+            <div class="col-sm-3">
+                <label for="destSelector">To: </label>
+                <select name="destSelector" class="form-control" @bind="destValue">
+                    <option value="Any">@Utils.ANY</option>
+                    @if (airports == null)
+                    {
+                        <option>Loading...</option>
+                    }
+                    else
+                    {
+                        @foreach (var a in airports)
+                        {
+                            <option value=@a>@a</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- Select dropdown for Day -->
+            <div class="col-sm-3">
+                <label for="daySelector">Day: </label>
+                <select name="daySelector" class="form-control" @bind="dayValue">
+                    <option value="@Utils.ANY">@Utils.ANY</option>
+                    <option value="@Utils.SUNDAY">@Utils.SUNDAY</option>
+                    <option value="@Utils.MONDAY">@Utils.MONDAY</option>
+                    <option value="@Utils.TUESDAY">@Utils.TUESDAY</option>
+                    <option value="@Utils.WEDNESDAY">@Utils.WEDNESDAY</option>
+                    <option value="@Utils.THURSDAY">@Utils.THURSDAY</option>
+                    <option value="@Utils.FRIDAY">@Utils.FRIDAY</option>
+                    <option value="@Utils.SATURDAY">@Utils.SATURDAY</option>
+                </select>
+            </div>
+
+            <!-- Find Flights Button -->
+            <div class="col-sm-3">
+                <button class="btn btn-primary form-control" @onclick="@FindFlights">Find flights</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <header class="align-content-center">
+            <h3>Flights</h3>
+        </header>
+        <div class="row">
+            <label for="fliteredFlights">Flight Search Result:</label>
+            <select name="fliteredFlights" class="form-control" @onchange="@fillForm">
+                @if (flightList == null || flightList.Count == 0)
+                {
+                    <option>Select Search Criteria</option>
+                }
+                else
+                {
+                    <option>Select a flight from this list</option>
+                    @foreach (var f in flightList)
+                    {
+                        <option value=@f.FlightId>@f.FlightId , @f.Airline, @f.Source.Name, @f.Destination.Name, @f.Day, @f.Time, @f.Cost</option>
+                    }
+                }
+
+            </select>
+        </div>
+    </div>
+
+
+        <!-- Add UI code for Reserve Section -->
+        <div class="row">
+            <header class="align-content-center">
+                <h3>Reserve a Flight</h3>
+            </header>
+            <div class="row">
+                <label for="travellerName">Traveller's Name:</label>
+                <input type="text" id="travellerName" class="form-control" />
+            </div>
+            <div class="row">
+                <label for="citizenship">Citizenship:</label>
+                <input type="text" id="citizenship" class="form-control" />
+            </div>
+            <div class="row">
+                <button class="btn btn-success form-control" @onclick="@ReserveFlight">Reserve</button>
+            </div>
+        </div>
+
+
+        <!-- Add UI code for Search Reservation Section -->
+        <div class="row">
+            <header class="align-content-center">
+                <h3>Search Reservations</h3>
+            </header>
+        </div>
+
+
+
+
+@code {
+    private FlightManager fm = FlightManager.INSTANCE;
+
+    private string srcValue;
+    private string destValue;
+    private string dayValue = Utils.ANY;
+    private List<string> airports = FlightManager.GetAiportCodeList();
+    private List<Flight> flightList = new();
+
+
+    private void FindFlights() 
+    {
+        flightList = fm.FindFlights(srcValue, destValue, dayValue);
+    }
+
+    private void fillForm(ChangeEventArgs e)
+    {
+        
+    }
+
+}
